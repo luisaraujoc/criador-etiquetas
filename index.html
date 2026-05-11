@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Etiquetas!</title>
+    <style>
+        /* =========================================
+           ESTILOS DO APLICATIVO (TELA)
+        ========================================= */
+        :root {
+            --primary: #32a86b;
+            --bg: #f5f6f5; /* Off-white */
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .no-print.container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .setup-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 80px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        #forms-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .form-group h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 16px;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 5px;
+        }
+
+        .input-row {
+            margin-bottom: 8px;
+        }
+
+        .input-row label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .input-row input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #btn-print {
+            width: 100%;
+            font-size: 18px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        #print-area {
+            display: none;
+        }
+
+        /* =========================================
+           ESTILOS DE IMPRESSÃO (FOLHA A4)
+        ========================================= */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Configuração da página A4 */
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+
+            #print-area {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 2mm; /* Espaço entre as etiquetas para facilitar o corte */
+                align-content: flex-start;
+            }
+
+            .etiqueta {
+                width: 5.5cm;
+                height: 1.8cm;
+                border: 2px solid black;
+                box-sizing: border-box;
+                background: white;
+                font-family: Arial, sans-serif;
+                display: flex;
+                flex-direction: column;
+                page-break-inside: avoid; /* Impede que a etiqueta seja cortada no meio na virada da página */
+                overflow: hidden;
+            }
+
+            .tarja-preta {
+                background-color: black;
+                color: white;
+                font-size: 5pt;
+                font-weight: bold;
+                text-align: center;
+                padding: 2px 0;
+                letter-spacing: 0.5px;
+            }
+
+            .conteudo {
+                display: flex;
+                flex: 1;
+                padding: 1px 3px;
+            }
+
+            .dados {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 1px;
+            }
+
+            .linha-dado {
+                display: flex;
+                align-items: flex-end;
+                font-size: 5.5pt;
+                line-height: 1;
+            }
+
+            .label-dado {
+                white-space: nowrap;
+            }
+
+            .pontinhos {
+                flex-grow: 1;
+                border-bottom: 1px dotted black;
+                margin: 0 2px;
+                position: relative;
+                top: -2px;
+            }
+
+            .valor-dado {
+                font-weight: bold;
+                white-space: nowrap;
+            }
+
+            .logo-faama {
+                width: 1.2cm;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+                font-size: 4pt;
+                font-weight: bold;
+                padding-bottom: 2px;
+                text-align: center;
+                line-height: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print container">
+        <h1>🏷️ Criador de Etiquetas!</h1>
+        
+        <div class="setup-section">
+            <label>Nº de etiquetas a criar:</label>
+            <input type="number" id="numLabels" min="1" value="5">
+            <button onclick="gerarCampos()">Gerar Campos</button>
+        </div>
+
+        <div id="forms-container"></div>
+
+        <button id="btn-print" style="display:none;" onclick="prepararEImprimir()">🖨️ Preparar e Imprimir</button>
+    </div>
+
+    <div id="print-area"></div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Função para gerar os formulários de preenchimento
+        function gerarCampos() {
+            const num = parseInt(document.getElementById('numLabels').value);
+            const container = document.getElementById('forms-container');
+            container.innerHTML = ''; 
+
+            if (num < 1) return;
+
+            for (let i = 1; i <= num; i++) {
+                const formHtml = `
+                    <div class="form-group" id="label-form-${i}">
+                        <h3>Etiqueta ${i}</h3>
+                        <div class="input-row">
+                            <label>Item:</label>
+                            <input type="text" class="input-item" placeholder="Ex: CALDEIRAO" value="">
+                        </div>
+                        <div class="input-row">
+                            <label>Código:</label>
+                            <input type="text" class="input-codigo" placeholder="Ex: 13014" value="">
+                        </div>
+                        <div class="input-row">
+                            <label>Nota Fiscal:</label>
+                            <input type="text" class="input-nf" placeholder="Ex: 49367" value="">
+                        </div>
+                        <div class="input-row">
+                            <label>Aquisição (Data):</label>
+                            <input type="date" class="input-data" placeholder="Ex: 23/03/2026" value="">
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', formHtml);
+            }
+            
+            // Mostra o botão de imprimir
+            document.getElementById('btn-print').style.display = 'block';
+        }
+
+        function prepararEImprimir() {
+            const forms = document.querySelectorAll('.form-group');
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = ''; 
+
+            forms.forEach(form => {
+                const item = form.querySelector('.input-item').value || '...';
+                const codigo = form.querySelector('.input-codigo').value || '...';
+                const nf = form.querySelector('.input-nf').value || '...';
+                const data = form.querySelector('.input-data').value || '...';
+
+                const etiquetaHtml = `
+                    <div class="etiqueta">
+                        <div class="tarja-preta">FACULDADE ADVENTISTA DA AMAZÔNIA</div>
+                        <div class="conteudo">
+                            <div class="dados">
+                                <div class="linha-dado">
+                                    <span class="label-dado">Item</span>
+                                    <span class="pontinhos"></span>
+                                    <span class="valor-dado">${item.toUpperCase()}</span>
+                                </div>
+                                <div class="linha-dado">
+                                    <span class="label-dado">Codigo</span>
+                                    <span class="pontinhos"></span>
+                                    <span class="valor-dado">${codigo}</span>
+                                </div>
+                                <div class="linha-dado">
+                                    <span class="label-dado">Nota Fiscal</span>
+                                    <span class="pontinhos"></span>
+                                    <span class="valor-dado">${nf}</span>
+                                </div>
+                                <div class="linha-dado">
+                                    <span class="label-dado">Aquisição</span>
+                                    <span class="pontinhos"></span>
+                                    <span class="valor-dado">${data}</span>
+                                </div>
+                            </div>
+                            <div class="logo-faama">
+                                <img src="./src/FAAMA Logo.svg" alt="Logo FAAMA" style="width: 50%; max-height: 50%; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                printArea.insertAdjacentHTML('beforeend', etiquetaHtml);
+            });
+
+            // Um pequeno atraso (100ms) só para garantir que o navegador 
+            // terminou de desenhar as divs novas antes de bater a "foto" pro PDF
+            setTimeout(() => {
+                ipcRenderer.send('imprimir-pdf');
+            }, 100);
+        }
+
+        window.onload = gerarCampos;
+    </script>
+</body>
+</html>

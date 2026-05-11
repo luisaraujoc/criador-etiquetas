@@ -1,0 +1,29 @@
+{
+  "name": "criador-de-etiquetas",
+  "version": "1.0.0",
+  "description": "Gerador de etiquetas para a FAAMA",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.luiscouto.criador-de-etiquetas",
+    "productName": "Criador de Etiquetas",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "Criador-de-Etiquetas.exe"
+    }
+  }
+}
