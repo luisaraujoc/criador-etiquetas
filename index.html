@@ -248,7 +248,7 @@
     <div id="print-area"></div>
 
     <script>
-        const { ipcRenderer } = require('electron');
+        // Removido o import do ipcRenderer (Electron)
 
         // Função para gerar os formulários de preenchimento
         function gerarCampos() {
@@ -276,7 +276,7 @@
                         </div>
                         <div class="input-row">
                             <label>Aquisição (Data):</label>
-                            <input type="date" class="input-data" placeholder="Ex: 23/03/2026" value="">
+                            <input type="date" class="input-data" value="">
                         </div>
                     </div>
                 `;
@@ -296,7 +296,13 @@
                 const item = form.querySelector('.input-item').value || '...';
                 const codigo = form.querySelector('.input-codigo').value || '...';
                 const nf = form.querySelector('.input-nf').value || '...';
-                const data = form.querySelector('.input-data').value || '...';
+                
+                // Pega a data bruta (YYYY-MM-DD) e formata para (DD/MM/YYYY)
+                let dataValue = form.querySelector('.input-data').value;
+                let dataFormatada = '...';
+                if (dataValue) {
+                    dataFormatada = dataValue.split('-').reverse().join('/');
+                }
 
                 const etiquetaHtml = `
                     <div class="etiqueta">
@@ -321,7 +327,7 @@
                                 <div class="linha-dado">
                                     <span class="label-dado">Aquisição</span>
                                     <span class="pontinhos"></span>
-                                    <span class="valor-dado">${data}</span>
+                                    <span class="valor-dado">${dataFormatada}</span>
                                 </div>
                             </div>
                             <div class="logo-faama">
@@ -333,10 +339,9 @@
                 printArea.insertAdjacentHTML('beforeend', etiquetaHtml);
             });
 
-            // Um pequeno atraso (100ms) só para garantir que o navegador 
-            // terminou de desenhar as divs novas antes de bater a "foto" pro PDF
+            // Revertemos para o comando nativo do navegador/Electron
             setTimeout(() => {
-                ipcRenderer.send('imprimir-pdf');
+                window.print();
             }, 100);
         }
 

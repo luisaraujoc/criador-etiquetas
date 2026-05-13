@@ -1,6 +1,6 @@
 {
   "name": "criador-de-etiquetas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gerador de etiquetas para a FAAMA",
   "main": "main.js",
   "scripts": {
